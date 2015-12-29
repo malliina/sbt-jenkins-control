@@ -2,11 +2,13 @@ package com.mle.sbt.jenkinsctrl
 
 import com.mle.jenkinsctrl.http.{BuildTask, JenkinsClient}
 import com.mle.jenkinsctrl.models.{BuildOrder, ConsoleProgress, JobName}
-import com.mle.jenkinsctrl.{CredentialsReader, JenkinsCredentials}
+import com.mle.jenkinsctrl.{JenkinsCredentials, JenkinsCredentialsReader}
 import com.mle.sbt.jenkinsctrl.JenkinsKeys._
 import sbt.Keys._
 import sbt._
 import sbt.complete.DefaultParsers._
+
+import scala.util.Try
 
 /**
   * @author mle
@@ -16,22 +18,26 @@ object JenkinsPlugin extends JenkinsPlugin
 trait JenkinsPlugin {
   val settings = Seq(
     logger := streams.value.log,
-    jenkinsCreds := new CredentialsReader().load,
+    jenkinsCreds := Try(new JenkinsCredentialsReader().load).toOption,
+    jenkinsReadCreds := {
+      def fail = sys.error(s"No Jenkins credentials specified. See SBT setting `jenkinsCreds`.")
+      jenkinsCreds.value.getOrElse(fail)
+    },
     jenkinsDefaultBuild := None,
     jenkinsBuildDefault := {
       val log = logger.value
-      val order = jenkinsDefaultBuild.value
-      order
-        .map(o => runLogged(o, jenkinsCreds.value, log))
-        .getOrElse(log.error(s"No default job specified. Please initialize setting `jenkinsDefaultBuild`."))
+      val buildSpecs = jenkinsDefaultBuild.value
+      buildSpecs
+        .map(specs => runLogged(specs, jenkinsReadCreds.value, log))
+        .getOrElse(sys.error(s"No default job specified. Please initialize setting `jenkinsDefaultBuild`."))
     },
     jenkinsBuild := {
       val log = logger.value
       val order = jenkinsReadBuild.evaluated
-      runLogged(order, jenkinsCreds.value, log)
+      runLogged(order, jenkinsReadCreds.value, log)
     },
     jenkinsTask := {
-      runJenkins(jenkinsReadBuild.evaluated, jenkinsCreds.value, logger.value)
+      runJenkins(jenkinsReadBuild.evaluated, jenkinsReadCreds.value, logger.value)
     },
     jenkinsReadBuild := {
       val params = spaceDelimited("<arg>").parsed.toList
@@ -47,6 +53,8 @@ trait JenkinsPlugin {
       }
     }
   )
+
+
 
   def runLogged(order: BuildOrder, creds: JenkinsCredentials, log: Logger): Option[ConsoleProgress] = {
     followBuild(order.job, runJenkins(order, creds, log), log)

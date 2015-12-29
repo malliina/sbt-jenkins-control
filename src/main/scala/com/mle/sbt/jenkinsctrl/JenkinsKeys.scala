@@ -15,5 +15,6 @@ trait JenkinsKeys {
   val jenkinsBuildDefault = taskKey[Unit]("Runs the build defined in `jenkinsDefaultBuild`")
   val jenkinsTask = inputKey[BuildTask]("Builds a Jenkins job, returning a task")
   val jenkinsReadBuild = inputKey[BuildOrder]("Reads a build order from the command line")
-  val jenkinsCreds = settingKey[JenkinsCredentials]("Jenkins credentials")
+  val jenkinsCreds = settingKey[Option[JenkinsCredentials]]("Jenkins credentials")
+  val jenkinsReadCreds = taskKey[JenkinsCredentials]("Reads credentials, failing if they cannot be read")
 }
