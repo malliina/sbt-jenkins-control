@@ -1,8 +1,8 @@
-package com.mle.sbt.jenkinsctrl
+package com.malliina.sbt.jenkinsctrl
 
-import com.mle.jenkinsctrl.JenkinsCredentials
-import com.mle.jenkinsctrl.http.BuildTask
-import com.mle.jenkinsctrl.models.BuildOrder
+import com.malliina.jenkinsctrl.JenkinsCredentials
+import com.malliina.jenkinsctrl.http.BuildTask
+import com.malliina.jenkinsctrl.models.BuildOrder
 import sbt._
 
 object JenkinsKeys extends JenkinsKeys

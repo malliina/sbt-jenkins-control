@@ -1,9 +1,9 @@
-package com.mle.sbt.jenkinsctrl
+package com.malliina.sbt.jenkinsctrl
 
-import com.mle.jenkinsctrl.http.{BuildTask, JenkinsClient}
-import com.mle.jenkinsctrl.models.{BuildOrder, ConsoleProgress, JobName}
-import com.mle.jenkinsctrl.{JenkinsCredentials, JenkinsCredentialsReader}
-import com.mle.sbt.jenkinsctrl.JenkinsKeys._
+import com.malliina.jenkinsctrl.http.{BuildTask, JenkinsClient}
+import com.malliina.jenkinsctrl.models.{BuildOrder, ConsoleProgress, JobName}
+import com.malliina.jenkinsctrl.{JenkinsCredentials, JenkinsCredentialsReader}
+import JenkinsKeys._
 import sbt.Keys._
 import sbt._
 import sbt.complete.DefaultParsers._
@@ -53,8 +53,6 @@ trait JenkinsPlugin {
       }
     }
   )
-
-
 
   def runLogged(order: BuildOrder, creds: JenkinsCredentials, log: Logger): Option[ConsoleProgress] = {
     followBuild(order.job, runJenkins(order, creds, log), log)

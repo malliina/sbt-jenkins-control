@@ -9,15 +9,16 @@ object SbtJenkinsBuild extends Build {
   lazy val sbtJenkins = Project("sbt-jenkins-control", file("."))
     .enablePlugins(bintray.BintrayPlugin)
     .settings(projectSettings: _*)
-  val malliinaOrg = "com.github.malliina"
+
+  val malliinaOrg = "com.malliina"
 
   lazy val projectSettings = Seq(
-    version := "0.0.9",
+    version := "0.2.0",
     scalaVersion := "2.10.6",
     organization := malliinaOrg,
     sbtPlugin := true,
     libraryDependencies ++= Seq(
-      malliinaOrg %% "jenkins-control" % "0.1.2"
+      malliinaOrg %% "jenkins-control" % "0.3.0"
     ),
     resolvers ++= Seq(
       Resolver.jcenterRepo,
