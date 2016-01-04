@@ -13,12 +13,12 @@ object SbtJenkinsBuild extends Build {
   val malliinaOrg = "com.malliina"
 
   lazy val projectSettings = Seq(
-    version := "0.2.0",
+    version := "0.2.1",
     scalaVersion := "2.10.6",
     organization := malliinaOrg,
     sbtPlugin := true,
     libraryDependencies ++= Seq(
-      malliinaOrg %% "jenkins-control" % "0.3.0"
+      malliinaOrg %% "jenkins-control" % "0.3.1"
     ),
     resolvers ++= Seq(
       Resolver.jcenterRepo,
