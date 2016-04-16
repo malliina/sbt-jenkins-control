@@ -68,10 +68,11 @@ trait JenkinsPlugin {
   )
 
   def runLogged(order: BuildOrder, creds: JenkinsCredentials, log: Logger): Option[ConsoleProgress] = {
-    followBuild(order.job, runJenkins(order, creds, log), log)
+    followBuild(runJenkins(order, creds, log), log)
   }
 
-  def followBuild(job: JobName, build: BuildTask, log: Logger): Option[ConsoleProgress] = {
+  def followBuild(build: BuildTask, log: Logger): Option[ConsoleProgress] = {
+    val job = build.job
     build.queueUpdates.subscribe(
       n => log.info(s"Job $job is in the build queue..."),
       err => log.error(s"Queueing failed: $err"),
