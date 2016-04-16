@@ -2,9 +2,6 @@ import bintray.BintrayKeys.{bintray => bintrayConf, bintrayOrganization, bintray
 import sbt.Keys._
 import sbt._
 
-/**
-  * A scala build file template.
-  */
 object SbtJenkinsBuild extends Build {
   lazy val sbtJenkins = Project("sbt-jenkins-control", file("."))
     .enablePlugins(bintray.BintrayPlugin)
@@ -13,12 +10,12 @@ object SbtJenkinsBuild extends Build {
   val malliinaOrg = "com.malliina"
 
   lazy val projectSettings = Seq(
-    version := "0.2.2",
+    version := "0.3.1",
     scalaVersion := "2.10.6",
     organization := malliinaOrg,
     sbtPlugin := true,
     libraryDependencies ++= Seq(
-      malliinaOrg %% "jenkins-control" % "0.3.2"
+      malliinaOrg %% "jenkins-control" % "0.4.0"
     ),
     resolvers ++= Seq(
       Resolver.jcenterRepo,

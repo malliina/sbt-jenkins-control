@@ -2,7 +2,6 @@ import sbt.Keys._
 import sbt._
 
 object BuildBuild extends Build {
-  val mleGroup = "com.github.malliina"
 
   override lazy val settings = super.settings ++ sbtPlugins ++ Seq(
     scalaVersion := "2.10.6"

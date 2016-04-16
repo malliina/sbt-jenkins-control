@@ -3,16 +3,16 @@ package com.malliina.sbt.jenkinsctrl
 import com.malliina.jenkinsctrl.http.{BuildTask, JenkinsClient}
 import com.malliina.jenkinsctrl.models.{BuildOrder, ConsoleProgress, JobName}
 import com.malliina.jenkinsctrl.{JenkinsCredentials, JenkinsCredentialsReader}
-import JenkinsKeys._
+import com.malliina.sbt.jenkinsctrl.JenkinsKeys._
 import sbt.Keys._
 import sbt._
 import sbt.complete.DefaultParsers._
 
-import scala.util.Try
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, Future}
+import scala.util.{Properties, Try}
 
-/**
-  * @author mle
-  */
 object JenkinsPlugin extends JenkinsPlugin
 
 trait JenkinsPlugin {
@@ -22,6 +22,19 @@ trait JenkinsPlugin {
     jenkinsReadCreds := {
       def fail = sys.error(s"No Jenkins credentials specified. See SBT setting `jenkinsCreds`.")
       jenkinsCreds.value.getOrElse(fail)
+    },
+    jenkinsOverview := {
+      val future = withClient(jenkinsReadCreds.value)(_.overview())
+      Await.result(future, 10.seconds)
+    },
+    jenkinsOverviewPrint := {
+      val overview = jenkinsOverview.value
+      val log = logger.value
+      val line = s"Mode: ${overview.mode}, executors: ${overview.numExecutors}, quieting down: ${overview.quietingDown}"
+      val jobs = overview.jobs.map(job => s"${job.name} at ${job.url}")
+      val lineSep = Properties.lineSeparator
+      val jobLines = jobs mkString lineSep
+      log.info(s"$line$lineSep$jobLines")
     },
     jenkinsDefaultBuild := None,
     jenkinsBuildDefault := {
@@ -70,8 +83,7 @@ trait JenkinsPlugin {
     build.consoleUpdates.toBlocking.lastOption
   }
 
-  /**
-    * Runs `order` using the Jenkins `creds`.
+  /** Runs `order` using the Jenkins `creds`.
     *
     * @param order
     * @param creds
@@ -90,6 +102,13 @@ trait JenkinsPlugin {
     // cleans up when the build completes
     build.consoleUpdates.subscribe(_ => (), err => client.close(), () => client.close())
     build
+  }
+
+  def withClient[T](creds: JenkinsCredentials)(code: JenkinsClient => Future[T]): Future[T] = {
+    val client = new JenkinsClient(creds)
+    val future = code(client)
+    future.onComplete(_ => client.close())
+    future
   }
 
   def separateWith[K, V](separator: String, map: Map[K, V]) =
