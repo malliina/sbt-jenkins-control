@@ -2,7 +2,7 @@ import bintray.BintrayKeys.{bintray => bintrayConf, bintrayOrganization, bintray
 import sbt.Keys._
 import sbt._
 
-object SbtJenkinsBuild extends Build {
+object SbtJenkinsBuild {
   lazy val sbtJenkins = Project("sbt-jenkins-control", file("."))
     .enablePlugins(bintray.BintrayPlugin)
     .settings(projectSettings: _*)
@@ -10,7 +10,7 @@ object SbtJenkinsBuild extends Build {
   val malliinaOrg = "com.malliina"
 
   lazy val projectSettings = Seq(
-    version := "0.3.1",
+    version := "0.3.2-SNAPSHOT",
     scalaVersion := "2.10.6",
     organization := malliinaOrg,
     sbtPlugin := true,
